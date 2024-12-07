@@ -26,7 +26,7 @@ To run tests matching a specific pattern, use the -k option:
 
 """
 
-import pytest
+import pytest  # noqa: F401
 from neso_solar_consumer.fetch_data import fetch_data, fetch_data_using_sql
 
 
@@ -69,6 +69,4 @@ def test_data_consistency():
     """
     df_api = fetch_data(resource_id, limit, columns, rename_columns)
     df_sql = fetch_data_using_sql(sql_query, columns, rename_columns)
-    assert df_api.equals(
-        df_sql
-    ), "Data from fetch_data and fetch_data_using_sql are inconsistent!"
+    assert df_api.equals(df_sql), "Data from fetch_data and fetch_data_using_sql are inconsistent!"
