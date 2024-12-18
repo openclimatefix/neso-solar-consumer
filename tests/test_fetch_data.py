@@ -25,50 +25,47 @@ To run tests matching a specific pattern, use the -k option:
     pytest tests/test_fetch_data.py -k "fetch_data"
 
 """
-
-import pytest
 from neso_solar_consumer.fetch_data import fetch_data, fetch_data_using_sql
 
 
-resource_id = "db6c038f-98af-4570-ab60-24d71ebd0ae5"
-limit = 5
-columns = ["DATE_GMT", "TIME_GMT", "EMBEDDED_SOLAR_FORECAST"]
-rename_columns = {
-    "DATE_GMT": "start_utc",
-    "TIME_GMT": "end_utc",
-    "EMBEDDED_SOLAR_FORECAST": "solar_forecast_kw",
-}
-sql_query = f'SELECT * from "{resource_id}" LIMIT {limit}'
-
-
-def test_fetch_data_api():
+def test_fetch_data_api(test_config):
     """
     Test the fetch_data function to ensure it fetches and processes data correctly via API.
     """
-    df_api = fetch_data(resource_id, limit, columns, rename_columns)
+    df_api = fetch_data(
+        test_config["resource_id"],
+        test_config["limit"],
+        test_config["columns"],
+        test_config["rename_columns"],
+    )
     assert not df_api.empty, "fetch_data returned an empty DataFrame!"
     assert set(df_api.columns) == set(
-        rename_columns.values()
+        test_config["rename_columns"].values()
     ), "Column names do not match after renaming!"
 
 
-def test_fetch_data_sql():
+def test_fetch_data_sql(test_config):
     """
     Test the fetch_data_using_sql function to ensure it fetches and processes data correctly via SQL.
     """
-    df_sql = fetch_data_using_sql(sql_query, columns, rename_columns)
+    sql_query = f'SELECT * FROM "{test_config["resource_id"]}" LIMIT {test_config["limit"]}'
+    df_sql = fetch_data_using_sql(sql_query, test_config["columns"], test_config["rename_columns"])
     assert not df_sql.empty, "fetch_data_using_sql returned an empty DataFrame!"
     assert set(df_sql.columns) == set(
-        rename_columns.values()
+        test_config["rename_columns"].values()
     ), "Column names do not match after renaming!"
 
 
-def test_data_consistency():
+def test_data_consistency(test_config):
     """
     Validate that the data fetched by fetch_data and fetch_data_using_sql are consistent.
     """
-    df_api = fetch_data(resource_id, limit, columns, rename_columns)
-    df_sql = fetch_data_using_sql(sql_query, columns, rename_columns)
-    assert df_api.equals(
-        df_sql
-    ), "Data from fetch_data and fetch_data_using_sql are inconsistent!"
+    sql_query = f'SELECT * FROM "{test_config["resource_id"]}" LIMIT {test_config["limit"]}'
+    df_api = fetch_data(
+        test_config["resource_id"],
+        test_config["limit"],
+        test_config["columns"],
+        test_config["rename_columns"],
+    )
+    df_sql = fetch_data_using_sql(sql_query, test_config["columns"], test_config["rename_columns"])
+    assert df_api.equals(df_sql), "Data from fetch_data and fetch_data_using_sql are inconsistent!"

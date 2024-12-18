@@ -8,9 +8,7 @@ import json
 import pandas as pd
 
 
-def fetch_data(
-    resource_id: str, limit: int, columns: list, rename_columns: dict
-) -> pd.DataFrame:
+def fetch_data(resource_id: str, limit: int, columns: list, rename_columns: dict) -> pd.DataFrame:
     """
     Fetch data from the NESO API and process it into a Pandas DataFrame.
 
@@ -55,9 +53,7 @@ def fetch_data(
         return pd.DataFrame()
 
 
-def fetch_data_using_sql(
-    sql_query: str, columns: list, rename_columns: dict
-) -> pd.DataFrame:
+def fetch_data_using_sql(sql_query: str, columns: list, rename_columns: dict) -> pd.DataFrame:
     """
     Fetch data from the NESO API using an SQL query, process it, and return specific columns with renamed headers.
 
